@@ -9,30 +9,32 @@ namespace Expenses.WebAPI.Controllers
     [Route("[controller]")]
     public class ExpensesController : ControllerBase
     {
-        private static List<Expense> expenses = new List<Expense> {
-            new Expense{ Id = 0, Description= "Eating Out", Amount=11.99},
-            new Expense{ Id = 1, Description= "Gas", Amount=12.99},
-            new Expense{ Id = 2, Description= "Tuition", Amount=1111.99},
-        };
+        private readonly IExpenseService _expenseService;
+
+        public ExpensesController(IExpenseService expenseService) {
+            this._expenseService = expenseService;
+        }
+
         // GET: api/values
         [HttpGet("GetAll")]
-        public ActionResult<List<Expense>> Get()
+        public async Task<ActionResult<ServiceResponse<List<Expense>>>> Get()
         {
-            return Ok(expenses);
+            return Ok(await _expenseService.GetAllExpenses());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Expense> GetSingle(int id)
+        public async Task<ActionResult<ServiceResponse<Expense>>> GetSingle(int id)
         {
 
-            return (expenses.FirstOrDefault(e => e.Id == id));
+            return Ok(await _expenseService.GetExpenseById(id));
         }
 
         [HttpPost]
-        public ActionResult<List<Expense>> AddExpense(Expense newExpense) {
-            expenses.Add(newExpense);
-            return Ok(expenses);
+        public async Task<ActionResult<ServiceResponse<List<Expense>>>> AddExpense(Expense newExpense) {
+            return Ok(await _expenseService.AddExpense(newExpense));
         }
     }
+
+
 }
 
